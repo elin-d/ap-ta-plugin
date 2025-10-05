@@ -1,0 +1,28 @@
+{
+  parserClass="eu.crewmate.sdk.ts.parser.TsParser"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="Ts"
+  psiImplClassSuffix="Impl"
+  psiPackage="eu.crewmate.sdk.ts.psi"
+  psiImplPackage="eu.crewmate.sdk.ts.psi.impl"
+
+  elementTypeHolderClass="eu.crewmate.sdk.ts.psi.TsTypes"
+  elementTypeClass="eu.crewmate.sdk.ts.psi.TsElementType"
+  tokenTypeClass="eu.crewmate.sdk.ts.psi.TsTokenType"
+
+    psiImplUtilClass="eu.crewmate.sdk.ts.psi.impl.TsPsiImplUtil"
+}
+
+tsFile ::= item_*
+
+private item_ ::= (property |COMMENT|CRLF)
+
+property ::= KEY SEPARATOR? value? {
+    methods=[getKey]
+}
+
+value ::= KVALUE {
+    methods=[getName setName getReference getNameIdentifier]
+}

@@ -1,0 +1,54 @@
+{
+  parserClass="eu.crewmate.sdk.tc.parser.TcParser"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="Tc"
+  psiImplClassSuffix="Impl"
+  psiPackage="eu.crewmate.sdk.tc.psi"
+  psiImplPackage="eu.crewmate.sdk.tc.psi.impl"
+
+  elementTypeHolderClass="eu.crewmate.sdk.tc.psi.TcTypes"
+  elementTypeClass="eu.crewmate.sdk.tc.psi.TcElementType"
+  tokenTypeClass="eu.crewmate.sdk.tc.psi.TcTokenType"
+
+  psiImplUtilClass="eu.crewmate.sdk.tc.psi.impl.TcPsiImplUtil"
+}
+
+tcFile ::= container
+
+container ::=  (commentLine | pausedLine | line)*
+
+private line ::= verification_rule | procedure_line | action | unknown | EOL
+
+pausedLine ::= PAUSE+ line
+
+commentLine ::= COMMENT
+
+option ::= STR_OPTION | INT_OPTION | PATH_OPTION
+
+key ::= ELEMENT_KEY {
+  mixin="eu.crewmate.sdk.tc.psi.impl.TcKeyNamedElementImpl"
+  implements="eu.crewmate.sdk.tc.psi.TcKeyNamedElement"
+  methods=[getName setName getReference getNameIdentifier]
+};
+
+prname ::= PR_NAME{
+  mixin="eu.crewmate.sdk.tc.psi.impl.TcKeyNamedElementImpl"
+  implements="eu.crewmate.sdk.tc.psi.TcKeyNamedElement"
+  methods=[getName setName getReference getNameIdentifier]
+}
+
+vtype::= VER_TYPE
+vkey ::= IMAGE_NAME
+
+verification_rule ::= VERIFICATION vtype? option* vkey? option* EOL?
+
+procedure_line ::= PROCEDURE prname? option* EOL?
+
+unknown ::= (PYTHON+ EOL*)+{
+mixin="eu.crewmate.sdk.tc.psi.impl.TcInjectionHostImpl"
+implements="eu.crewmate.sdk.tc.psi.TcInjectionHost"
+}
+
+action ::= ELEMENT_TYPE key* key? VALUE? option* EOL?

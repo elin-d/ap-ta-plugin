@@ -9,7 +9,75 @@
     <resource-bundle>messages.MyBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.github.elind.aptaplugin.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
-        <postStartupActivity implementation="com.github.elind.aptaplugin.startup.MyProjectActivity" />
+        <applicationService serviceImplementation="services.MyApplicationService"/>
+        <projectService serviceImplementation="services.ProjectUtilsService"/>
+        <completion.contributor language="Tc" implementationClass="eu.crewmate.sdk.tc.TcCompletionContributor"/>
+        <fileType
+                name="TS File"
+                implementationClass="eu.crewmate.sdk.ts.TsFileType"
+                fieldName="INSTANCE"
+                language="Ts"
+                extensions="ts"/>
+        <fileType
+                name="TC File"
+                implementationClass="eu.crewmate.sdk.tc.TcFileType"
+                fieldName="INSTANCE"
+                language="Tc"
+                extensions="tc;ptc"/>
+        <lang.commenter language="Tc" implementationClass="eu.crewmate.sdk.common.TcsCommenter"/>
+        <lang.commenter language="Ts" implementationClass="eu.crewmate.sdk.common.TcsCommenter"/>
+        <lang.parserDefinition language="Ts" implementationClass="eu.crewmate.sdk.ts.TsParserDefinition"/>
+        <codeInsight.lineMarkerProvider language="Tc"
+                                        implementationClass="eu.crewmate.sdk.tc.TcVerificationLineMarkerProvider"/>
+        <iconProvider implementation="eu.crewmate.sdk.common.TcsIcon"/>
+        <annotator language="Tc" implementationClass="eu.crewmate.sdk.tc.TcAnnotator"/>
+        <projectConfigurable
+                groupId="project"
+                instance="eu.crewmate.sdk.common.TaSettingsConfigurable"
+                id="eu.crewmate.sdk.common.TaSettingsConfigurable"
+                displayName="TestAutomation Framework Plugin"/>
+        <multiHostInjector implementation="eu.crewmate.sdk.tc.PyInjector"/>
+        <dom.fileMetaData rootTagName="guimap" implementation="eu.crewmate.sdk.tc.dom.RootUIMapFileDescription"/>
+        <dom.fileMetaData rootTagName="element" implementation="eu.crewmate.sdk.tc.dom.UIElementFileDescription"/>
     </extensions>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <runConfigurationProducer
+                implementation="eu.crewmate.sdk.tc.run.TcRunConfigurationProducer"/>
+    </extensions>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <lang.parserDefinition
+                language="Tc"
+                implementationClass="eu.crewmate.sdk.tc.TcParserDefinition"/>
+    </extensions>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <lang.syntaxHighlighterFactory
+                language="Tc"
+                implementationClass="eu.crewmate.sdk.tc.TcSyntaxHighlighterFactory"/>
+    </extensions>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <colorSettingsPage
+                implementation="eu.crewmate.sdk.tc.TcColorSettingsPage"/>
+    </extensions>
+
+    <applicationListeners>
+        <listener class="listeners.MyProjectManagerListener"
+                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
+    </applicationListeners>
+
+    <projectListeners>
+        <listener topic="com.intellij.execution.ExecutionListener"
+                  class="eu.crewmate.sdk.tc.run.TcExecutionListener"/>
+    </projectListeners>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <projectService
+                serviceImplementation="eu.crewmate.sdk.common.TaSettingsState"/>
+    </extensions>
+
+    <depends>com.intellij.modules.python</depends>
+
 </idea-plugin>
