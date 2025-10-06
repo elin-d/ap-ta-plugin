@@ -12,7 +12,7 @@ import javax.swing.*;
 
 public class TcsIcon extends IconProvider {
 
-    public static final Icon FILE = IconLoader.getIcon("/icons/pluginIcon.svg", TcsIcon.class);
+    public static final Icon FILE_ICON = IconLoader.getIcon("/pluginIcon.svg", TcsIcon.class);
     public static final Icon TC_ICON = IconLoader.getIcon("/icons/tc.svg", TcsIcon.class);
     public static final Icon TS_ICON = IconLoader.getIcon("/icons/ts.svg", TcsIcon.class);
 

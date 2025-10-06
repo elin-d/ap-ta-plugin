@@ -30,7 +30,7 @@ public class TcColorSettingsPage implements ColorSettingsPage {
     @Nullable
     @Override
     public Icon getIcon() {
-        return TcsIcon.FILE;
+        return TcsIcon.FILE_ICON;
     }
 
     @NotNull

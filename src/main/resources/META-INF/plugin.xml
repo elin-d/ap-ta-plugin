@@ -63,10 +63,9 @@
                 implementation="eu.crewmate.sdk.tc.TcColorSettingsPage"/>
     </extensions>
 
-    <applicationListeners>
-        <listener class="listeners.MyProjectManagerListener"
-                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
-    </applicationListeners>
+    <extensions defaultExtensionNs="com.intellij">
+        <postStartupActivity implementation="listeners.ProjectStartupActivity"/>
+    </extensions>
 
     <projectListeners>
         <listener topic="com.intellij.execution.ExecutionListener"
