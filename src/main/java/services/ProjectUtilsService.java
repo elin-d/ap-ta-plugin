@@ -43,7 +43,7 @@ public class ProjectUtilsService {
     private static final String rootGUIFile = "AllplanGUIMap.xml";
     private final Project project;
 
-    private final Guimap guimap;
+    private Guimap guimap = null;
     private final String basePath;
     public Map<String, Set<String>> ContentFiles = Map.of(
             "toolbar", new HashSet<>(),
@@ -57,33 +57,31 @@ public class ProjectUtilsService {
 
     public ProjectUtilsService(Project project) {
         this.project = project;
-        String projectPath = project.getBasePath();
-        if (projectPath != null) {
-            // if we are direct under TestAutomation dir
-            if (projectPath.endsWith("TestAutomation")) {
-                basePath = projectPath;
-                // if we somewhere under TestAutomation dir
-            } else if (projectPath.contains("TestAutomation/")) {
-                basePath = projectPath.split("TestAutomation")[0] + "TestAutomation";
-                // Probably direct under root or TestAutomation somewhere in the project
-            } else {
-                VirtualFile vf = LocalFileSystem.getInstance().findFileByPath(projectPath);
-                if (vf != null) {
-                    basePath = Arrays.stream(vf.getChildren())
-                            .filter(c -> c.getName().equalsIgnoreCase("testautomation"))
-                            .findFirst().map(VirtualFile::getPath).orElse(projectPath);
-                } else basePath = projectPath;
-            }
-        } else basePath = "";
+        basePath = getTestAutomationRoot(project.getBasePath());
         addSourceFolder();
         String savedLang = project.getService(TaSettingsState.class).languageId;
         if (savedLang == null) savedLang = getPredictedLocalization();
         lang = savedLang.equals("none") ? "" : savedLang;
-        XmlFile root = (XmlFile) getFileByRelativePath(xmlBaseDir + rootGUIFile);
-        DomManager dm = DomManager.getDomManager(project);
-        DomFileElement<Guimap> domElement = dm.getFileElement(root, Guimap.class);
-        this.guimap = domElement != null ? domElement.getRootElement() : null;
-        updateContentFilesMap();
+    }
+
+    public static String getTestAutomationRoot(String projectPath) {
+        if (projectPath != null) {
+            // if we are direct under TestAutomation dir
+            if (projectPath.endsWith("TestAutomation")) {
+                return projectPath;
+                // if we somewhere under TestAutomation dir
+            } else if (projectPath.contains("TestAutomation/")) {
+                return projectPath.split("TestAutomation")[0] + "TestAutomation";
+            } else {
+                VirtualFile vf = LocalFileSystem.getInstance().findFileByPath(projectPath);
+                if (vf != null) {
+                    return Arrays.stream(vf.getChildren())
+                            .filter(c -> c.getName().equalsIgnoreCase("testautomation"))
+                            .findFirst().map(VirtualFile::getPath).orElse(projectPath);
+                } else return projectPath;
+            }
+        }
+        return "";
     }
 
     public static List<XmlAttributeValue> findAttributesInXmls(Set<PsiFile> psiSet, String tag) {
@@ -112,7 +110,7 @@ public class ProjectUtilsService {
 
     public void setLanguage(String language) {
         this.lang = language;
-        updateContentFilesMap();
+        fillContentFilesMap();
     }
 
     public String getPredictedLocalization() {
@@ -120,8 +118,13 @@ public class ProjectUtilsService {
         return vf == null ? "none" : "deu";
     }
 
-    public void updateContentFilesMap() {
-        if (guimap == null) return;
+    public void fillContentFilesMap() {
+        if (guimap != null) return;
+        XmlFile root = (XmlFile) getFileByRelativePath(xmlBaseDir + rootGUIFile);
+        DomManager dm = DomManager.getDomManager(project);
+        DomFileElement<Guimap> domElement = dm.getFileElement(root, Guimap.class);
+        if (domElement == null) return;
+        this.guimap = domElement.getRootElement();
         List<Element> searchTree = guimap.getElements();
         for (var entry : ContentFiles.entrySet()) {
             entry.getValue().clear();
@@ -140,17 +143,17 @@ public class ProjectUtilsService {
                     else if (!ke.getElements().isEmpty()) {
                         if (ke.getXdeep().exists()) {
                             Element ne = ke;
-                            while (ne.getElements().size() > 0) {
-                                ne = ne.getElements().get(0);
+                            while (!ne.getElements().isEmpty()) {
+                                ne = ne.getElements().getFirst();
                                 if (ne.getXfile().exists()) {
                                     result.add(ne.getXfile().getStringValue());
                                     break;
                                 }
                             }
                         } else {
-                            ke = ke.getElements().get(0);
+                            ke = ke.getElements().getFirst();
                             if (ke.getXfile().exists())
-                                result.add(ke.getXfile().getStringValue()
+                                result.add(Objects.requireNonNull(ke.getXfile().getStringValue())
                                         .replace("{%LanguageConfig.LanguageTag%}", lang));
                         }
                     } else if (ke.getXref().exists()) {
@@ -176,6 +179,7 @@ public class ProjectUtilsService {
     }
 
     public Set<PsiFile> getKeyXmlFiles(PsiElement ele) {
+        if (guimap == null) fillContentFilesMap();
         Set<PsiFile> result = new HashSet<>();
         TcAction line = (TcAction) ele.getParent();
         PsiElement firstKey = ele.getParent().getChildren()[0];
@@ -201,6 +205,7 @@ public class ProjectUtilsService {
     }
 
     public String searchByXref(String xref) {
+        if (guimap == null) fillContentFilesMap();
         String result = null;
         String[] keys = xref.split("/");
         int depth = 0;
@@ -264,15 +269,14 @@ public class ProjectUtilsService {
 
     public void addSourceFolder() {
 
-        Module[] module = ModuleManager.getInstance(project).getModules();
-        if (module.length == 0) return;
-        VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByPath(basePath + TASrcDir);
-        if (vf == null) return;
-        VirtualFile moduleSourceRoot = ProjectRootManager.getInstance(project).getFileIndex().getSourceRootForFile(vf);
-        // Source dir already set
-        if (moduleSourceRoot != null) return;
-
         Runnable runnable = () -> {
+            Module[] module = ModuleManager.getInstance(project).getModules();
+            if (module.length == 0) return;
+            VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByPath(basePath + TASrcDir);
+            if (vf == null) return;
+            VirtualFile moduleSourceRoot = ProjectRootManager.getInstance(project).getFileIndex().getSourceRootForFile(vf);
+            // Source dir already set
+            if (moduleSourceRoot != null) return;
             //getting RootModel for default module (with hope it's TestAutomation)
             ModifiableRootModel rootModel = ModuleRootManager.getInstance(module[0]).getModifiableModel();
             //at least default file should exist
