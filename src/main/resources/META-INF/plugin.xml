@@ -1,7 +1,7 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
-<idea-plugin>
-    <id>com.github.elind.aptaplugin</id>
-    <name>ap-ta-plugin</name>
+<idea-plugin dynamic="true">
+    <id>com.github.elind.apta</id>
+    <name>ap-ta</name>
     <vendor>elin-d</vendor>
 
     <depends>com.intellij.modules.platform</depends>
@@ -35,7 +35,7 @@
                 groupId="project"
                 instance="eu.crewmate.sdk.common.TaSettingsConfigurable"
                 id="eu.crewmate.sdk.common.TaSettingsConfigurable"
-                displayName="TestAutomation Framework Plugin"/>
+                displayName="TestAutomation Framework"/>
         <multiHostInjector implementation="eu.crewmate.sdk.tc.PyInjector"/>
         <dom.fileMetaData rootTagName="guimap" implementation="eu.crewmate.sdk.tc.dom.RootUIMapFileDescription"/>
         <dom.fileMetaData rootTagName="element" implementation="eu.crewmate.sdk.tc.dom.UIElementFileDescription"/>

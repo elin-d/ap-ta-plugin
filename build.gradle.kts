@@ -112,7 +112,7 @@ intellijPlatform {
 
     pluginVerification {
         ides {
-            recommended()
+            create("PC", "2024.3.6")
         }
     }
 }
