@@ -2,24 +2,36 @@
 
 ![Build](https://github.com/elin-d/ap-ta-plugin/workflows/Build/badge.svg)
 
-## ToDo list
-- [] Configure the [CODECOV_TOKEN](https://docs.codecov.com/docs/quick-start) secret for automated test coverage reports on PRs
 
 <!-- Plugin description -->
 
 A JetBrains PyCharm plugin that provides enhanced IDE support for the Allplan test automation framework
 
 
-🔍 Smart Code Completion Intelligent: auto-completion for test case syntax and framework-specific keywords Context-aware suggestions based on the testing framework conventions.
+🔍 Smart Code Completion
+
+- Intelligent auto-completion for test case syntax and framework-specific keywords
+- Context-aware suggestions based on the testing framework conventions.
 
 
-✅ Code Verification and Validation Real-time syntax validation for test case files Line markers to indicate test verification points and potential issues Inline error detection and quick fixes.
+✅ Code Verification and Validation
+
+- Real-time syntax validation for test case files
+- Line markers to indicate test verification points and potential issues
+- Inline error detection and quick fixes.
 
 
-📝 Language Support Custom lexical analysis for test case files (.tc files) Syntax highlighting tailored for Allplan test automation scripts Proper code formatting and structure recognition.
+📝 Language Support
 
+- Custom lexical analysis for test case files (.tc files)
+- Syntax highlighting tailored for Allplan test automation scripts
+- Proper code formatting and structure recognition.
 
-🛠️ Developer Tools Seamless integration with IntelliJ IDEA's development environment Enhanced navigation and code browsing capabilities Support for refactoring operations on test case files.
+🛠 Developer Tools
+
+- Seamless integration with IntelliJ Pycharm's development environment
+- Enhanced navigation and code browsing capabilities
+- Support for refactoring operations on test case files.
 
 <!-- Plugin description end -->
 
